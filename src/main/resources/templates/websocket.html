@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <title>聊天呀</title>
+</head>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+<script>
+    var message = "";
+    var socket;
+
+    function openSocket() {
+        if (typeof (WebSocket) != "undefined") {
+            var socketUrl = "ws://localhost:9999/imserver/" + $("#userId").val();
+            // socketUrl = socketUrl.replace("https", "ws").replace("http", "ws");
+            if (socket != null) {
+
+                socket.close();
+                socket = null;
+            }
+            socket = new WebSocket(socketUrl);
+
+            //打开事件
+            socket.onopen = function () {
+
+                alert("聊天已开启 !");
+                // console.log("WebSocket 已打开 !");
+            };
+
+            //获得消息事件
+            socket.onmessage = function (msg) {
+
+                message = message + "\n" + "收到消息 : " + msg.data;
+                $("#receiveMessage").val(message);
+            };
+
+            //关闭事件
+            socket.onclose = function () {
+
+                console.log("WebSocket 已关闭 !");
+            };
+            //发生错误
+            socket.onerror = function () {
+
+                console.log("WebSocket 发生错误 !");
+            }
+        } else {
+            console.log("浏览器不支持 WebSocket !");
+        }
+    }
+
+    function sendMessage() {
+        if (typeof (WebSocket) == "undefined") {
+
+            console.log("浏览器不支持 WebSocket !");
+        } else {
+
+            console.log('{"toUserId":"' + $("#toUserId").val() + '","contentText":"' + $("#contentText").val() + '"}');
+            socket.send('{"toUserId":"' + $("#toUserId").val() + '","contentText":"' + $("#contentText").val() + '"}');
+            message = message + "\n" + "发送消息 : " + $("#contentText").val();
+            $("#receiveMessage").val(message);
+        }
+    }
+</script>
+<body>
+<input id="userId" name="userId" type="hidden" th:value="${fromUserId}">
+<input id="toUserId" name="toUserId" type="hidden" th:value="${toUserId}">
+<p><textarea id="receiveMessage" cols="50" rows="25"></textarea>
+<p><input id="contentText" name="contentText" type="text" /><button onclick="sendMessage()">发送</button>
+<p>【操作】 : <button onclick="openSocket()">开启聊天</button>
+</body>
+
+</html>
