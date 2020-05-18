@@ -16,9 +16,9 @@ import org.springframework.web.servlet.ModelAndView;
 @RestController
 public class DemoController {
 
-    @GetMapping("index")
-    public ResponseEntity<String> index(){
-        return ResponseEntity.ok("请求成功");
+    @GetMapping("/index")
+    public String index(){
+        return "请求成功";
     }
 
     @GetMapping(value = "/page")
