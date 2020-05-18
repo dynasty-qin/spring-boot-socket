@@ -23,9 +23,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class WebSocketServer {
 
     /**
-     * 静态变量，用来记录当前在线连接数。应该把它设计成线程安全的。
+     * 记录当前在线连接数, 设计成线程安全
      */
-    private static int onlineCount = 0;
+    private static volatile int onlineCount = 0;
     /**
      * concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。
      */
@@ -34,6 +34,7 @@ public class WebSocketServer {
      * 与某个客户端的连接会话，需要通过它来给客户端发送数据
      */
     private Session session;
+
     /**
      * 接收userId
      */
@@ -59,6 +60,7 @@ public class WebSocketServer {
      */
     @OnOpen
     public void onOpen(Session session, @PathParam("userId") String userId) {
+
         this.session = session;
         this.userId = userId;
         if (webSocketMap.containsKey(userId)) {
@@ -157,15 +159,15 @@ public class WebSocketServer {
         }
     }
 
-    public static synchronized int getOnlineCount() {
+    private static synchronized int getOnlineCount() {
         return onlineCount;
     }
 
     public static synchronized void addOnlineCount() {
-        WebSocketServer.onlineCount++;
+        WebSocketServer.onlineCount ++;
     }
 
     public static synchronized void subOnlineCount() {
-        WebSocketServer.onlineCount--;
+        WebSocketServer.onlineCount --;
     }
 }
